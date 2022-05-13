@@ -1,2 +1,2 @@
-pub mod circuit;
 pub mod ast;
+pub mod circuit;

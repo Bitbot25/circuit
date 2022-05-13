@@ -1,16 +1,16 @@
-use std::collections::HashMap;
-
-use circuit::interpreter::environment::Environment;
-use circuit::interpreter::object::CircuitObject;
 use circuit::lexer;
+use circuit::lexer::token::TokenKind;
 use circuit::parser::circuit::Circuit;
+use circuit::span::{FileIndex, SpanStack};
 
 const CODE: &str = r#"
-asd.to_string();
+a
 "#;
-
+// FIXME: ASD
 fn main() {
     let tokens = lexer::tokenize(CODE);
-    let ast = Circuit::new(tokens).parse();
-    println!("{:#?}", ast);
+    let res = Circuit::new(tokens).expect(TokenKind::Bang, "Expected '!'");
+    if let Err(error) = res {
+        println!("{}", error.span().display(CODE));
+    }
 }

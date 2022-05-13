@@ -1,8 +1,9 @@
 use std::fmt::Debug;
 
-use crate::parser::ast::{Ast, AbstractStatement, AbstractExpression, Block};
-use super::{prototype::Prototype, environment::Environment};
+use super::{environment::Environment, prototype::Prototype};
+use crate::parser::ast::{AbstractExpression, AbstractStatement, Ast, Block};
 
 pub struct CircuitObject {
     env: Environment,
+    prototype: Prototype,
 }

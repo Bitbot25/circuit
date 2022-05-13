@@ -1,5 +1,5 @@
-use std::fmt::Debug;
 use crate::span::Span;
+use std::fmt::Debug;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TokenKind {

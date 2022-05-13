@@ -1,3 +1,3 @@
 pub mod environment;
-pub mod prototype;
 pub mod object;
+pub mod prototype;

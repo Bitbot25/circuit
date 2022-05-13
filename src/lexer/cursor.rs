@@ -1,10 +1,9 @@
 use unicode_xid::UnicodeXID;
 
-use crate::span::*;
 use crate::lexer::token::{Token, TokenKind};
+use crate::span::*;
+use std::iter::Peekable;
 use std::str::Chars;
-
-use super::Lexer;
 
 const KEYWORDS: [(&'static str, TokenKind); 4] = [
     ("if", TokenKind::If),
@@ -13,83 +12,56 @@ const KEYWORDS: [(&'static str, TokenKind); 4] = [
     ("return", TokenKind::Return),
 ];
 
-pub struct Cursor<'a> {
+pub struct Lexer<'a> {
     src: &'a str,
-    iter: Chars<'a>,
+    iter: Peekable<Chars<'a>>,
     span: Span,
-    #[cfg(debug_assertions)]
-    prev: Option<char>,
 }
 
-impl<'a> Cursor<'a> {
-    pub(super) fn new(input: &'a str) -> Cursor<'a> {
-        Cursor {
+impl<'a> Lexer<'a> {
+    pub(super) fn new(input: &'a str) -> Lexer<'a> {
+        Lexer {
             src: input,
-            iter: input.chars(),
-            span: Span {
-                begin: RichIndex {
+            iter: input.chars().peekable(),
+            span: Span(
+                FileIndex {
                     index: 0,
                     line: 0,
                     column: 0,
                 },
-                end: RichIndex {
+                FileIndex {
                     index: 0,
                     line: 0,
                     column: 0,
                 },
-            },
-            #[cfg(debug_assertions)]
-            prev: None,
+            ),
         }
     }
 
     fn bump(&mut self) -> Option<char> {
         let c = self.iter.next();
-        #[cfg(debug_assertions)]
-        {
-            self.prev = c;
-        }
-        if c.is_some() {
-            self.span.notice(c.unwrap());
+        if let Some(c) = c {
+            self.span.notice(c);
         }
         c
     }
 
+    fn peek(&mut self) -> Option<char> {
+        self.iter.peek().map(|c| *c)
+    }
+
     fn span_str(&self) -> &'a str {
-        &self.src[self.span.begin.index..self.span.end.index]
+        &self.src[self.span.0.index..self.span.1.index]
     }
 
     fn bump_while(&mut self, mut pred: impl FnMut(char) -> bool) {
-        while !self.is_eof() && pred(self.peek().unwrap()) {
+        // Let chains is unstable so we don't use `while let`.
+        while self.peek().is_some() && pred(self.peek().unwrap()) {
             self.bump();
         }
     }
 
-    #[cfg(debug_assertions)]
-    fn prev(&self) -> Option<char> {
-        self.prev
-    }
-}
-
-fn is_symbol_start(c: char) -> bool {
-    UnicodeXID::is_xid_start(c)
-}
-
-fn is_symbol_continue(c: char) -> bool {
-    UnicodeXID::is_xid_continue(c)
-}
-
-fn is_whitespace(c: char) -> bool {
-    matches!(
-        c,
-        ' ' |
-        '\t' |
-        '\n'
-    )
-}
-
-impl<'a> Lexer for Cursor<'a> {
-    fn bump_token(&mut self) -> Option<Token> {
+    pub fn bump_token(&mut self) -> Option<Token> {
         self.reset_span();
         let c = self.bump()?;
         if is_whitespace(c) {
@@ -108,7 +80,7 @@ impl<'a> Lexer for Cursor<'a> {
                 } else {
                     TokenKind::Assign
                 }
-            },
+            }
             '!' => {
                 if let Some('=') = self.peek() {
                     self.bump();
@@ -116,7 +88,7 @@ impl<'a> Lexer for Cursor<'a> {
                 } else {
                     TokenKind::Bang
                 }
-            },
+            }
             '.' => TokenKind::Dot,
             ',' => TokenKind::Comma,
             ';' => TokenKind::Semi,
@@ -129,50 +101,48 @@ impl<'a> Lexer for Cursor<'a> {
             _ => return None,
         };
         Some(Token {
-            span: self.span,
+            span: self.span.clone(),
             kind: token_kind,
         })
     }
 
     fn ident_or_kw(&mut self) -> Option<TokenKind> {
-        debug_assert!(self.prev.is_some() && is_symbol_start(self.prev.unwrap()));
-
         self.bump_while(is_symbol_continue);
 
         let val = self.span_str();
-        
+
         for (kw, kind) in KEYWORDS {
             if val == kw {
-                return Some(kind)
+                return Some(kind);
             }
         }
 
-        return Some(TokenKind::Ident(String::from(val)))
+        return Some(TokenKind::Ident(String::from(val)));
     }
 
     fn number(&mut self) -> Option<TokenKind> {
         // TODO: Add support for signed ints and floats.
-        debug_assert!(self.prev.is_some() && self.prev.unwrap().is_digit(10));
-
         self.bump_while(|c| c.is_digit(10));
-        Some(TokenKind::UInt(
-            self.span_str().parse().unwrap(),
-        ))
+        Some(TokenKind::UInt(self.span_str().parse().unwrap()))
     }
 
-    fn span(&self) -> Span {
-        self.span
+    pub fn span(&self) -> Span {
+        self.span.clone()
     }
 
     fn reset_span(&mut self) {
-        self.span.tp_end();
+        self.span.blip();
     }
+}
 
-    fn peek(&self) -> Option<char> {
-        self.iter.clone().next()
-    }
+fn is_symbol_start(c: char) -> bool {
+    UnicodeXID::is_xid_start(c)
+}
 
-    fn peek_n(&self, n: usize) -> Option<char> {
-        self.iter.clone().nth(n)
-    }
+fn is_symbol_continue(c: char) -> bool {
+    UnicodeXID::is_xid_continue(c)
+}
+
+fn is_whitespace(c: char) -> bool {
+    matches!(c, ' ' | '\t' | '\n')
 }

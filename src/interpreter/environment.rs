@@ -2,13 +2,18 @@ use std::collections::HashMap;
 
 use super::object::CircuitObject;
 
+pub const EQ: &str = "__eq__";
+pub const CALL: &str = "__call__";
+
 pub struct Environment {
-    values: HashMap<String, CircuitObject>
+    values: HashMap<String, CircuitObject>,
 }
 
 impl Environment {
     pub fn new() -> Environment {
-        Environment { values: HashMap::new() }
+        Environment {
+            values: HashMap::new(),
+        }
     }
 
     pub fn with_native() -> Environment {
@@ -25,13 +30,3 @@ impl Environment {
         self.values.get(name)
     }
 }
-
-
-
-
-
-
-
-
-
-

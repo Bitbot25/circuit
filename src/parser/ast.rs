@@ -22,7 +22,7 @@ pub enum AbstractExpression {
     BlockExpression(Block),
     PropertyAccess(PropertyAccess),
     Unary(Unary),
-    Var(Token),
+    CEnvPropertyAccess(Token),
     Call(Call),
 }
 

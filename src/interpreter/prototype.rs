@@ -1,4 +1,5 @@
-pub struct Prototype<'a> {
-    properties: Vec<Prototype<'a>>,
-    parent: &'a Prototype<'a>,
+pub struct Prototype {
+    properties: Vec<Prototype>,
+    id: usize,
+    name: String,
 }
