@@ -1,16 +1,13 @@
-use circuit::lexer;
-use circuit::lexer::token::TokenKind;
-use circuit::parser::circuit::Circuit;
-use circuit::span::{FileIndex, SpanStack};
+use circuit::{lexer::{self, token::{Token, TokenKind}}, parser::{ParseStream, ast::*}};
+use circuit::parser::circuit as parse;
 
 const CODE: &str = r#"
-a
+"hello
 "#;
 // FIXME: ASD
 fn main() {
-    let tokens = lexer::tokenize(CODE);
-    let res = Circuit::new(tokens).expect(TokenKind::Bang, "Expected '!'");
-    if let Err(error) = res {
-        println!("{}", error.span().display(CODE));
-    }
+    let tokens = lexer::tokenize(CODE).unwrap();
+    //println!("{:#?}", tokens.collect::<Vec<Token>>());
+    let mut parse_stream = ParseStream::new(tokens);
+    println!("{:?}", parse::literal(&mut parse_stream));
 }

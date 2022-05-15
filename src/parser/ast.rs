@@ -15,20 +15,26 @@ pub enum AbstractStatement {
 pub enum AbstractExpression {
     Grouping(Box<AbstractExpression>),
     BinaryOp(BinaryOp),
-    Lit(Token),
+    Lit(Literal),
     // Inline block expression
     // Example:
     // my_fn({ return 2+2; })
     BlockExpression(Block),
     PropertyAccess(PropertyAccess),
     Unary(Unary),
-    CEnvPropertyAccess(Token),
     Call(Call),
 }
 
 #[derive(Debug)]
+
+pub struct Literal {
+    pub tok: Token,
+}
+
+#[derive(Debug)]
 pub struct PropertyAccess {
-    pub obj: Box<AbstractExpression>,
+    // None means the current environment
+    pub obj: Option<Box<AbstractExpression>>,
     pub property: Token,
 }
 

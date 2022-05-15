@@ -1,14 +1,42 @@
-use crate::span::Span;
+use std::collections::VecDeque;
 
-use self::{cursor::Lexer, token::Token};
+use crate::{span::Span, iter::TakeErrorsExt};
 
-pub mod cursor;
+use self::{lex::{Lexer, LexError}, token::Token};
+
+pub mod lex;
 pub mod token;
 
-pub fn tokenize_with<'a>(mut lexer: Lexer<'a>) -> impl Iterator<Item = Token> + 'a {
-    std::iter::from_fn(move || lexer.bump_token())
+pub struct TokenStream {
+    queue: VecDeque<Token>,
+    span: Span,
 }
 
-pub fn tokenize<'a>(input: &'a str) -> impl Iterator<Item = Token> + 'a {
-    tokenize_with(Lexer::<'a>::new(input))
+impl TokenStream {
+    pub fn new(mut lexer: Lexer) -> Result<TokenStream, LexError> {
+        Ok(TokenStream {
+            queue: std::iter::from_fn(move || lexer.token()).take_errors().map_err(|errors| errors.into_iter().next().expect("WTF"))?.collect(),
+            span: Default::default(),
+        })
+    }
+
+    pub fn peek(&mut self) -> Option<Token> {
+        self.queue.get(0).map(|tok| *tok)
+    }
+
+    pub fn span(&self) -> Span {
+        self.span
+    }
+}
+
+impl Iterator for TokenStream {
+    type Item = Token;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.queue.pop_front()
+    }
+}
+
+pub fn tokenize(input: &str) -> Result<TokenStream, LexError> {
+    TokenStream::new(Lexer::new(input))
 }
