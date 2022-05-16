@@ -1,5 +1,5 @@
 use super::{ast::*, ParseStream};
-use crate::lexer::token::TokenKind;
+use crate::lexer::token::{TokenKind, Token};
 
 pub fn literal(stream: &mut ParseStream) -> Result<AbstractExpression, &'static str> {
     let tok = stream.consume_any([TokenKind::UInt, TokenKind::String]).ok_or("Expected number or string.")?;
@@ -7,12 +7,22 @@ pub fn literal(stream: &mut ParseStream) -> Result<AbstractExpression, &'static 
 }
 
 pub fn property(stream: &mut ParseStream) -> Result<AbstractExpression, &'static str> {
+    // TODO: Replace `ident` with `call`
     if let Some(init_prop) = stream.consume(TokenKind::Ident) {
-        todo!()
-        //let mut expr = AbstractExpression::PropertyAccess(());
+        let mut expr = AbstractExpression::PropertyAccess(PropertyAccess { obj: None, property: init_prop });
+        while let Some(_) = stream.consume(TokenKind::Dot) {
+            let property = ident(stream)?;
+            expr = AbstractExpression::PropertyAccess(PropertyAccess { obj: Some(Box::new(expr)), property });
+        }
+        
+        Ok(expr)
     } else {
         literal(stream)
     }
+}
+
+pub fn ident(stream: &mut ParseStream) -> Result<Token, &'static str> {
+    stream.consume(TokenKind::Ident).ok_or("Expected identifier.")
 }
 
 /*pub fn property(&mut self) -> Result<AbstractExpression, CircuitError> {

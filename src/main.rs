@@ -2,12 +2,12 @@ use circuit::{lexer::{self, token::{Token, TokenKind}}, parser::{ParseStream, as
 use circuit::parser::circuit as parse;
 
 const CODE: &str = r#"
-"hello
 "#;
 // FIXME: ASD
 fn main() {
     let tokens = lexer::tokenize(CODE).unwrap();
+    println!("Tokens {:#?}", tokens);
     //println!("{:#?}", tokens.collect::<Vec<Token>>());
     let mut parse_stream = ParseStream::new(tokens);
-    println!("{:?}", parse::literal(&mut parse_stream));
+    println!("AST {:#?}", parse::property(&mut parse_stream));
 }

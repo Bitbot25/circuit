@@ -1,4 +1,4 @@
-use std::collections::VecDeque;
+use std::{collections::VecDeque, fmt::Debug};
 
 use crate::{span::Span, iter::TakeErrorsExt};
 
@@ -34,6 +34,15 @@ impl Iterator for TokenStream {
 
     fn next(&mut self) -> Option<Self::Item> {
         self.queue.pop_front()
+    }
+}
+
+impl Debug for TokenStream {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "TokenStream ")?;
+        f.debug_list()
+            .entries(&self.queue)
+            .finish()
     }
 }
 
