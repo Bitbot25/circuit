@@ -3,7 +3,6 @@ use unicode_xid::UnicodeXID;
 use crate::lexer::token::{Token, TokenKind};
 use crate::span::*;
 use std::iter::Peekable;
-use std::ops::Deref;
 use std::str::Chars;
 
 const KEYWORDS: [(&'static str, TokenKind); 4] = [
@@ -15,27 +14,12 @@ const KEYWORDS: [(&'static str, TokenKind); 4] = [
 
 #[derive(Debug)]
 pub struct LexError {
-    entry: CharEntry,
-    details: String,
-}
-
-#[derive(Debug)]
-pub struct CharEntry {
-    inner: char,
-    index: FileIndex,
-}
-
-impl Deref for CharEntry {
-    type Target = char;
-
-    fn deref(&self) -> &Self::Target {
-        &self.inner
-    }
+    pub span: Span,
+    pub details: String,
 }
 
 pub struct Lexer<'a> {
     src: &'a str,
-    entry: Option<CharEntry>,
     iter: Peekable<Chars<'a>>,
     span: Span,
 }
@@ -44,7 +28,6 @@ impl<'a> Lexer<'a> {
     pub(super) fn new(input: &'a str) -> Lexer<'a> {
         Lexer {
             src: input,
-            entry: None,
             iter: input.chars().peekable(),
             span: Default::default(),
         }
@@ -53,14 +36,13 @@ impl<'a> Lexer<'a> {
     fn bump(&mut self) -> Option<char> {
         let c = self.iter.next();
         c.map(|c| {
-            self.entry = Some(CharEntry { inner: c, index: self.span.1 });
             self.span.notice(c);
             c
         })
     }
 
     fn peek(&mut self) -> Option<char> {
-        self.iter.peek().map(|c| *c)
+        self.iter.peek().copied()
     }
 
     fn span_str(&self) -> &'a str {
@@ -139,7 +121,7 @@ impl<'a> Lexer<'a> {
             }
         }
 
-        return TokenKind::Ident;
+        TokenKind::Ident
     }
 
     fn number(&mut self) -> TokenKind {
@@ -149,11 +131,11 @@ impl<'a> Lexer<'a> {
     }
 
     fn error(&mut self, details: String) -> LexError {
-        LexError { entry: self.entry.take().expect("Got an error but there was not char entry??"), details: details }
+        LexError { span: self.span, details: details }
     }
 
     pub fn span(&self) -> Span {
-        self.span.clone()
+        self.span
     }
 
     fn reset_span(&mut self) {

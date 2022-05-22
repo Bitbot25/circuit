@@ -20,10 +20,10 @@ impl<R, E, I: Iterator<Item=Result<R, E>>> TakeErrorsExt for I {
                 Ok(ok) => success.push_back(ok),
             }
         }
-        if errors.len() > 0 {
-            Err(errors)
-        } else {
+        if errors.is_empty() {
             Ok(TakeErrorsIter { internal: success })
+        } else {
+            Err(errors)
         }
     }
 }

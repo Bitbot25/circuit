@@ -14,7 +14,7 @@ pub enum AbstractStatement {
 #[derive(Debug)]
 pub enum AbstractExpression {
     Grouping(Box<AbstractExpression>),
-    BinaryOp(BinaryOp),
+    Binary(Binary),
     Lit(Literal),
     // Inline block expression
     // Example:
@@ -54,7 +54,7 @@ pub struct Unary {
 #[derive(Debug)]
 pub struct Call {
     pub expr: Box<AbstractExpression>,
-    pub arguments: Vec<AbstractExpression>,
+    pub args: Vec<AbstractExpression>,
 }
 
 #[derive(Debug)]
@@ -63,7 +63,7 @@ pub struct Block {
 }
 
 #[derive(Debug)]
-pub struct BinaryOp {
+pub struct Binary {
     pub operator: Token,
     pub lhs: Box<AbstractExpression>,
     pub rhs: Box<AbstractExpression>,

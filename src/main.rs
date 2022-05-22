@@ -1,13 +1,15 @@
-use circuit::{lexer::{self, token::{Token, TokenKind}}, parser::{ParseStream, ast::*}};
-use circuit::parser::circuit as parse;
+use circuit::{lexer, parser::ParseStream};
+use circuit::parser::parse;
 
 const CODE: &str = r#"
+cos(2) * 5
 "#;
-// FIXME: ASD
+
 fn main() {
-    let tokens = lexer::tokenize(CODE).unwrap();
+    let tokens = lexer::tokenize(CODE).map_err(|errors| format!("Unable tokenize input: {:?}", errors.into_iter().map(|error| error.details))).unwrap();
     println!("Tokens {:#?}", tokens);
     //println!("{:#?}", tokens.collect::<Vec<Token>>());
     let mut parse_stream = ParseStream::new(tokens);
-    println!("AST {:#?}", parse::property(&mut parse_stream));
+    
+    println!("AST {:#?}", parse::add(&mut parse_stream));
 }

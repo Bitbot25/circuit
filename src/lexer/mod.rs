@@ -13,15 +13,15 @@ pub struct TokenStream {
 }
 
 impl TokenStream {
-    pub fn new(mut lexer: Lexer) -> Result<TokenStream, LexError> {
+    pub fn new(mut lexer: Lexer) -> Result<TokenStream, Vec<LexError>> {
         Ok(TokenStream {
-            queue: std::iter::from_fn(move || lexer.token()).take_errors().map_err(|errors| errors.into_iter().next().expect("WTF"))?.collect(),
+            queue: std::iter::from_fn(move || lexer.token()).take_errors()?.collect(),
             span: Default::default(),
         })
     }
 
     pub fn peek(&mut self) -> Option<Token> {
-        self.queue.get(0).map(|tok| *tok)
+        self.queue.get(0).copied()
     }
 
     pub fn span(&self) -> Span {
@@ -46,6 +46,6 @@ impl Debug for TokenStream {
     }
 }
 
-pub fn tokenize(input: &str) -> Result<TokenStream, LexError> {
+pub fn tokenize(input: &str) -> Result<TokenStream, Vec<LexError>> {
     TokenStream::new(Lexer::new(input))
 }
