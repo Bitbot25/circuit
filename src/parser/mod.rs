@@ -1,19 +1,22 @@
+use std::ops::Range;
+
 use crate::lexer::{
     token::{Token, TokenKind},
     TokenStream,
 };
-
+use crate::span::Span;
 
 pub mod ast;
 pub mod parse;
 
-pub struct ParseStream {
+pub struct ParseStream<'src> {
     tokens: TokenStream,
+    lexeme: &'src str,
 }
 
-impl ParseStream {
-    pub fn new(tokens: TokenStream) -> ParseStream {
-        ParseStream { tokens }
+impl<'src> ParseStream<'src> {
+    pub fn new(tokens: TokenStream, lexeme: &'src str) -> ParseStream<'src> {
+        ParseStream { tokens, lexeme }
     }
 
     pub fn peek(&mut self) -> Option<Token> {
@@ -75,11 +78,18 @@ impl ParseStream {
         } else {
             Err(err)
         }
+    }
 
+    pub fn src(&self, range: Range<usize>) -> &'src str {
+        &self.lexeme[range]
+    }
+
+    pub fn src_from_span(&self, span: Span) -> &'src str {
+        &self.lexeme[span.0.index..span.1.index]
     }
 }
 
-impl Iterator for ParseStream {
+impl<'src> Iterator for ParseStream<'src> {
     type Item = Token;
 
     fn next(&mut self) -> Option<Self::Item> {

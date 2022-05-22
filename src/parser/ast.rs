@@ -6,7 +6,7 @@ pub type Ast = Vec<AbstractStatement>;
 pub enum AbstractStatement {
     Expr(AbstractExpression),
     // A block can appear without an expression statement
-    BlockStatement(Block),
+    Block(Block),
     FunctionDecl(FunctionDecl),
     Return(AbstractExpression),
 }
@@ -15,7 +15,7 @@ pub enum AbstractStatement {
 pub enum AbstractExpression {
     Grouping(Box<AbstractExpression>),
     Binary(Binary),
-    Lit(Literal),
+    Literal(AbstractLiteral),
     // Inline block expression
     // Example:
     // my_fn({ return 2+2; })
@@ -26,9 +26,9 @@ pub enum AbstractExpression {
 }
 
 #[derive(Debug)]
-
-pub struct Literal {
-    pub tok: Token,
+pub enum AbstractLiteral {
+    UInt(u64),
+    String(String),
 }
 
 #[derive(Debug)]
@@ -59,7 +59,7 @@ pub struct Call {
 
 #[derive(Debug)]
 pub struct Block {
-    pub statements: Ast,
+    pub stmts: Ast,
 }
 
 #[derive(Debug)]

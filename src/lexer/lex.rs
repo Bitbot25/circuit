@@ -8,7 +8,7 @@ use std::str::Chars;
 const KEYWORDS: [(&'static str, TokenKind); 4] = [
     ("if", TokenKind::If),
     ("for", TokenKind::For),
-    ("function", TokenKind::Function),
+    ("fun", TokenKind::Fun),
     ("return", TokenKind::Return),
 ];
 

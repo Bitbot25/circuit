@@ -17,7 +17,7 @@ pub enum TokenKind {
     If,
     For,
     Return,
-    Function,
+    Fun,
 
     LParen,
     RParen,
@@ -60,7 +60,7 @@ impl Debug for Token {
                 If => "if",
                 For => "for",
                 Return => "return",
-                Function => "function",
+                Fun => "fun",
 
                 LParen => "(",
                 RParen => ")",
