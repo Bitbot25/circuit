@@ -1,9 +1,0 @@
-add -> mul ('+' | '-' mul)*
-mul -> unary ('*' | '/' unary)*
-unary -> ('-' | '!' unary) | property
-property -> (ident (('.' ident) | ('(' invk_args ')'))*) | lit
-lit -> number | string
-
-number -> '0'..'9'+
-string -> '"' strc* '"' 
-strc -> !'"'
