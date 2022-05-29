@@ -7,7 +7,12 @@ use crate::lexer::{
 use crate::span::Span;
 
 pub mod ast;
-pub mod parse;
+mod parse;
+
+pub use parse::statement;
+pub use parse::expression;
+
+pub type Result<T> = std::result::Result<T, &'static str>;
 
 pub struct ParseStream<'src> {
     tokens: TokenStream,
@@ -71,7 +76,7 @@ impl<'src> ParseStream<'src> {
         None
     }
 
-    pub fn expect(&mut self, kind: TokenKind, err: &'static str) -> Result<(), &'static str> {
+    pub fn expect(&mut self, kind: TokenKind, err: &'static str) -> Result<()> {
         let tok = self.tokens.next().ok_or(err)?;
         if tok.kind == kind {
             Ok(())

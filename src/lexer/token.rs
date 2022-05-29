@@ -81,22 +81,22 @@ impl Debug for Token {
 
 #[macro_export]
 macro_rules! Tok {
-    [+] => { $crate::token::TokenKind::Plus };
-    [-] => { $crate::token::TokenKind::Minus };
-    [*] => { $crate::token::TokenKind::Star };
-    [/] => { $crate::token::TokenKind::Slash };
-    [true] => { $crate::token::TokenKind::True };
-    [false] => { $crate::token::TokenKind::False };
-    [if] => { $crate::token::TokenKind::If };
-    [for] => { $crate::token::TokenKind::For };
-    [return] => { $crate::token::TokenKind::Return };
-    [function] => { $crate::token::TokenKind::Function };
-    [=] => { $crate::token::TokenKind::Eq }; 
-    [==] => { $crate::token::TokenKind::EqEq };
-    [!] => { $crate::token::TokenKind::Bang };
-    [!=] => { $crate::token::TokenKind::BangEq };
-    [.] => { $crate::token::TokenKind::Dot };
-    [;] => { $crate::token::TokenKind::Semi };
-    [,] => { $crate::token::TokenKind::Comma };
+    [+] => { $crate::lexer::token::TokenKind::Plus };
+    [-] => { $crate::lexer::token::TokenKind::Minus };
+    [*] => { $crate::lexer::token::TokenKind::Star };
+    [/] => { $crate::lexer::token::TokenKind::Slash };
+    [true] => { $crate::lexer::token::TokenKind::True };
+    [false] => { $crate::lexer::token::TokenKind::False };
+    [if] => { $crate::lexer::token::TokenKind::If };
+    [for] => { $crate::lexer::token::TokenKind::For };
+    [return] => { $crate::lexer::token::TokenKind::Return };
+    [function] => { $crate::lexer::token::TokenKind::Function };
+    [=] => { $crate::lexer::token::TokenKind::Eq }; 
+    [==] => { $crate::lexer::token::TokenKind::EqEq };
+    [!] => { $crate::lexer::token::TokenKind::Bang };
+    [!=] => { $crate::lexer::token::TokenKind::BangEq };
+    [.] => { $crate::lexer::token::TokenKind::Dot };
+    [;] => { $crate::lexer::token::TokenKind::Semi };
+    [,] => { $crate::lexer::token::TokenKind::Comma };
 }
 

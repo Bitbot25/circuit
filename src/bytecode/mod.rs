@@ -38,3 +38,5 @@ impl Debug for ByteStream {
             .finish()
     }
 }
+
+// TODO: Make a Display implementation that shows the actual instruction names

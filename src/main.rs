@@ -1,7 +1,7 @@
 extern crate circuit_lang as circuit;
 
 use circuit::{lexer, parser::ParseStream};
-use circuit::parser::parse;
+use circuit::parser;
 
 const CODE: &str = r#"
 fun hello() {
@@ -16,5 +16,5 @@ fn main() {
     //println!("{:#?}", tokens.collect::<Vec<Token>>());
     let mut parse_stream = ParseStream::new(tokens, CODE);
     
-    println!("AST {:#?}", parse::statement(&mut parse_stream));
+    println!("AST {:#?}", parser::statement(&mut parse_stream));
 }
